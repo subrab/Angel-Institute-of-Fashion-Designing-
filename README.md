@@ -3,9 +3,9 @@
 Digital platform project for a real, currently-offline business in Tirunelveli, Tamil Nadu —
 a fashion design institute and a tailoring studio run under one roof.
 
-**Status: Phase 0 (foundation) complete. Homepage design mockup in progress. No application
-code has been written yet — this repo currently holds planning documents and a static,
-front-end-only design preview.**
+**Status: Phase 0 (foundation) complete. Phase 1 in progress — database is live on
+Neon. Homepage design mockup in progress. No backend API or frontend app code has
+been written yet.**
 
 ## Repo structure
 
@@ -14,6 +14,9 @@ docs/
   ANGEL-PHASE0-CLAUDE-PACKAGE.md   Business info pack + master build prompt
   01-PHASE0-FOUNDATION.md          Product vision, personas, feature matrix, architecture,
                                     database/API proposals, Release 1 backlog
+database/
+  schema.sql                       Release 1 schema (applied to the live Neon database)
+  README.md                        Table-by-table explanation + how to connect
 assets/
   logo/                            Isolated Angel logo mark (white-bg and transparent PNG)
 mockups/
