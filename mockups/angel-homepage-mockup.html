@@ -459,6 +459,7 @@
     color:#1e5e30; font-size:0.9rem; display:none; border-radius:8px;
   }
   .toast.show{display:block;}
+  .toast.error{background:rgba(200,40,40,0.08); border-color:rgba(200,40,40,0.35); color:#8a1f1f;}
 
   .global-toast{
     position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px);
@@ -853,7 +854,7 @@
           <textarea id="message" placeholder="Tell us a little more..."></textarea>
         </div>
         <button type="submit" class="btn primary block">Send enquiry</button>
-        <p class="form-note">This form is a design preview — it isn't connected to Angel's systems yet.</p>
+        <p class="form-note">We'll only use these details to get back to you about your enquiry.</p>
         <div class="toast" id="toast">Thanks! This is a preview — once connected, your enquiry would be sent to Angel's team.</div>
       </form>
     </div>
@@ -896,9 +897,69 @@
 <div class="global-toast" id="globalToast"></div>
 
 <script>
+  var API_BASE = 'https://angel-institute-of-fashion-designing.onrender.com';
+
   document.getElementById('enquiryForm').addEventListener('submit', function(e){
     e.preventDefault();
-    document.getElementById('toast').classList.add('show');
+
+    var form = e.target;
+    var btn = form.querySelector('button[type="submit"]');
+    var toast = document.getElementById('toast');
+
+    var name = document.getElementById('name').value.trim();
+    var phone = document.getElementById('phone').value.trim();
+    var interestLabel = document.getElementById('interest').value;
+    var userMessage = document.getElementById('message').value.trim();
+
+    // The form shows specific choices; the API only tracks institute vs tailoring
+    // at the business-unit level -- so the exact choice is preserved in the message
+    // instead of being lost.
+    var interestMap = {
+      'Fashion Designing course': 'institute',
+      'Tailoring course': 'institute',
+      'A tailoring order': 'tailoring',
+      'Something else': 'institute'
+    };
+    var interested_in = interestMap[interestLabel] || 'institute';
+    var combinedMessage = 'Interested in: ' + interestLabel + (userMessage ? ('. ' + userMessage) : '');
+
+    btn.disabled = true;
+    var originalText = btn.textContent;
+    btn.textContent = 'Sending...';
+    toast.classList.remove('show', 'error');
+
+    fetch(API_BASE + '/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        phone: phone,
+        interested_in: interested_in,
+        source: 'website',
+        message: combinedMessage
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().then(function (d) {
+            throw new Error(d.error || 'Something went wrong.');
+          });
+        }
+        return res.json();
+      })
+      .then(function () {
+        toast.textContent = "Thanks! Your enquiry has been sent — we'll get back to you soon.";
+        toast.classList.add('show');
+        form.reset();
+      })
+      .catch(function (err) {
+        toast.textContent = 'Could not send that just now (' + err.message + '). Please WhatsApp us instead.';
+        toast.classList.add('show', 'error');
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      });
   });
 
   function showGlobalToast(msg){
