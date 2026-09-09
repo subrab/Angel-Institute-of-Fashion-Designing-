@@ -135,47 +135,78 @@
       <div class="diagram-card glass">
         <h2>How to measure</h2>
         <div class="sub">Numbers match the fields on the right</div>
-        <svg viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
-          <!-- torso outline -->
-          <path class="body-outline" d="M160 40 C146 40 136 48 130 58 L108 72 L100 90 L124 100 L124 130
-            C110 142 100 168 100 200 C100 250 112 300 130 330 L130 360 C130 372 144 380 160 380
-            C176 380 190 372 190 360 L190 330 C208 300 220 250 220 200 C220 168 210 142 196 130
-            L196 100 L220 90 L212 72 L190 58 C184 48 174 40 160 40 Z"/>
-          <!-- neckline -->
-          <path d="M140 50 C148 60 172 60 180 50" stroke="#1C120E" stroke-width="1.6" fill="none"/>
+        <svg viewBox="0 0 320 350" xmlns="http://www.w3.org/2000/svg">
+          <!-- head -->
+          <circle class="body-outline" cx="160" cy="34" r="22"/>
+          <!-- neck -->
+          <path class="body-outline" d="M150 54 L170 54 L166 70 L154 70 Z"/>
 
-          <!-- extended right arm for sleeve length -->
-          <path class="body-outline" d="M194 102 L242 116 C252 119 258 126 260 136 L266 186 C267 193 261 197 256 194 L250 148 C249 142 244 138 238 136 L190 122 Z"/>
+          <!-- torso + hip silhouette -->
+          <path class="body-outline" d="M110 82
+            C 100 92, 94 100, 96 108
+            C 98 122, 100 136, 100 150
+            C 100 168, 106 188, 118 205
+            C 104 216, 96 228, 98 242
+            C 96 260, 100 276, 108 290
+            C 110 305, 112 318, 115 330
+            L 205 330
+            C 208 318, 210 305, 212 290
+            C 220 276, 224 260, 222 242
+            C 224 228, 216 216, 202 205
+            C 214 188, 220 168, 220 150
+            C 220 136, 222 122, 224 108
+            C 226 100, 220 92, 210 82
+            C 196 74, 178 70, 160 70
+            C 142 70, 124 74, 110 82 Z"/>
+
+          <!-- left arm (relaxed at side) -->
+          <path class="body-outline" d="M112 86
+            C 96 100, 84 124, 80 154
+            C 77 178, 76 202, 78 224
+            L 84 240 L 90 226
+            C 89 202, 90 178, 93 154
+            C 97 128, 105 106, 118 92 Z"/>
+
+          <!-- right arm (relaxed at side) -->
+          <path class="body-outline" d="M208 86
+            C 224 100, 236 124, 240 154
+            C 243 178, 244 202, 242 224
+            L 236 240 L 230 226
+            C 231 202, 230 178, 227 154
+            C 223 128, 215 106, 202 92 Z"/>
+
+          <!-- neckline suggestion -->
+          <path d="M148 70 C153 76, 167 76, 172 70" stroke="#1C120E" stroke-width="1.4" fill="none"/>
 
           <!-- 1 Shoulder line -->
-          <line class="guide-line" x1="108" y1="72" x2="212" y2="72"/>
-          <circle class="badge" cx="160" cy="58" r="12"/>
-          <text class="badge-text" x="160" y="59">1</text>
+          <line class="guide-line" x1="112" y1="80" x2="208" y2="80"/>
+          <circle class="badge" cx="160" cy="62" r="12"/>
+          <text class="badge-text" x="160" y="63">1</text>
 
           <!-- 2 Bust line -->
-          <line class="guide-line" x1="100" y1="175" x2="220" y2="175"/>
-          <circle class="badge" cx="235" cy="175" r="12"/>
-          <text class="badge-text" x="235" y="176">2</text>
+          <line class="guide-line" x1="96" y1="155" x2="224" y2="155"/>
+          <circle class="badge" cx="256" cy="155" r="12"/>
+          <text class="badge-text" x="256" y="156">2</text>
 
           <!-- 3 Waist line -->
-          <line class="guide-line" x1="106" y1="270" x2="214" y2="270"/>
-          <circle class="badge" cx="229" cy="270" r="12"/>
-          <text class="badge-text" x="229" y="271">3</text>
+          <line class="guide-line" x1="104" y1="207" x2="216" y2="207"/>
+          <circle class="badge" cx="248" cy="207" r="12"/>
+          <text class="badge-text" x="248" y="208">3</text>
 
-          <!-- 4 Blouse length: shoulder to hem, left side -->
-          <line class="guide-line" x1="80" y1="72" x2="80" y2="365"/>
-          <circle class="badge" cx="62" cy="220" r="12"/>
-          <text class="badge-text" x="62" y="221">4</text>
+          <!-- 4 Blouse length: shoulder to hem, well clear of the arm -->
+          <line class="guide-line" x1="50" y1="80" x2="50" y2="330"/>
+          <circle class="badge" cx="34" cy="205" r="12"/>
+          <text class="badge-text" x="34" y="206">4</text>
 
-          <!-- 5 Sleeve length: shoulder point to wrist along arm -->
-          <line class="guide-line" x1="198" y1="108" x2="260" y2="140"/>
-          <circle class="badge" cx="280" cy="150" r="12"/>
-          <text class="badge-text" x="280" y="151">5</text>
+          <!-- 5 Sleeve length: along the right arm, shoulder to wrist -->
+          <line class="guide-line" x1="210" y1="88" x2="238" y2="228"/>
+          <circle class="badge" cx="270" cy="228" r="12"/>
+          <text class="badge-text" x="270" y="229">5</text>
 
-          <!-- 6 Armhole: curve at the left underarm, clear of the arm illustration -->
-          <path d="M116 74 C106 84 104 96 110 108" class="guide-line" fill="none"/>
-          <circle class="badge" cx="96" cy="90" r="12"/>
-          <text class="badge-text" x="96" y="91">6</text>
+          <!-- 6 Armhole: curve at the left underarm -->
+          <path d="M120 78 C104 90, 96 106, 98 124" class="guide-line" fill="none"/>
+          <circle class="badge" cx="76" cy="100" r="12"/>
+          <text class="badge-text" x="76" y="101">6</text>
         </svg>
 
         <div class="extra-guides">
