@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const { body, param, validationResult } = require('express-validator');
 const { pool } = require('../db');
 const { requireAuth, requireRole } = require('../middleware/auth');
+const { checkEmailIsGenuine } = require('../utils/emailCheck');
 
 const router = express.Router();
 
@@ -46,7 +47,14 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ error: 'Please check the review form and try again.', details: errors.array() });
       }
+
       const { author_name, phone, email, rating, comment } = req.body;
+
+      const emailCheck = await checkEmailIsGenuine(email);
+      if (!emailCheck.ok) {
+        return res.status(400).json({ error: emailCheck.reason });
+      }
+
       const { rows } = await pool.query(
         `INSERT INTO reviews (author_name, phone, email, rating, comment, source, status)
          VALUES ($1, $2, $3, $4, $5, 'website form', 'pending')

@@ -45,6 +45,7 @@ environment like Render with normal network access.
 - Passwords hashed with bcrypt (cost factor 12), never stored or logged in plain text.
 - JWT-based auth, 12-hour expiry.
 - Rate limiting on the public enquiry form and review submission endpoints.
+- Review submissions are checked against a disposable-email blocklist and a live DNS MX lookup, so obviously fake or throwaway email addresses are rejected before they reach the database.
 - `helmet` for security headers, CORS restricted via `CORS_ORIGINS` in `.env`.
 - No fee data anywhere in the courses table/API, per confirmed business policy.
 - A throwaway test admin account (`test-admin@angelinstitute.local`) was created
