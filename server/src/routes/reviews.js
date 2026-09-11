@@ -4,6 +4,7 @@ const { body, param, validationResult } = require('express-validator');
 const { pool } = require('../db');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { checkEmailIsGenuine } = require('../utils/emailCheck');
+const { checkMobileFormat } = require('../utils/phoneCheck');
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post(
   submitLimiter,
   [
     body('author_name').trim().isLength({ min: 1, max: 200 }),
-    body('phone').trim().isLength({ min: 6, max: 20 }),
+    body('phone').trim().isLength({ min: 1, max: 20 }),
     body('email').trim().isEmail().normalizeEmail(),
     body('rating').isInt({ min: 1, max: 5 }),
     body('comment').optional().trim().isLength({ max: 2000 }),
@@ -48,7 +49,12 @@ router.post(
         return res.status(400).json({ error: 'Please check the review form and try again.', details: errors.array() });
       }
 
-      const { author_name, phone, email, rating, comment } = req.body;
+      const { author_name, email, rating, comment } = req.body;
+
+      const phoneCheck = checkMobileFormat(req.body.phone);
+      if (!phoneCheck.ok) {
+        return res.status(400).json({ error: phoneCheck.reason });
+      }
 
       const emailCheck = await checkEmailIsGenuine(email);
       if (!emailCheck.ok) {
@@ -59,7 +65,7 @@ router.post(
         `INSERT INTO reviews (author_name, phone, email, rating, comment, source, status)
          VALUES ($1, $2, $3, $4, $5, 'website form', 'pending')
          RETURNING id, author_name, rating, status, created_at`,
-        [author_name, phone, email, rating, comment || null]
+        [author_name, phoneCheck.normalized, email, rating, comment || null]
       );
       res.status(201).json(rows[0]);
     } catch (err) {
