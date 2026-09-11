@@ -438,6 +438,17 @@
   .review-card p.quote{font-family:'Fraunces', serif; font-style:italic; font-size:1.02rem; color:var(--ink); margin-bottom:16px;}
   .review-card .who{font-size:0.85rem; color:var(--muted-2); font-weight:600;}
 
+  .review-write{max-width:640px; margin-top:40px; padding:34px; position:relative; z-index:2;}
+  .review-write h3{font-size:1.2rem; margin-bottom:6px;}
+  .review-write .sub{font-size:0.92rem; color:var(--muted); margin-bottom:22px;}
+  .star-picker{display:flex; gap:6px;}
+  .star-picker .star{
+    background:none; border:none; font-size:2rem; line-height:1; cursor:pointer; padding:4px;
+    color:rgba(28,18,14,0.18); transition:color .15s ease, transform .15s ease;
+  }
+  .star-picker .star:hover{transform:scale(1.12);}
+  .star-picker .star.active{color:var(--gold);}
+
   /* ---------- contact ---------- */
   .contact-grid{display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; position:relative; z-index:2;}
   .contact-info dl{margin:26px 0 0;}
@@ -852,6 +863,42 @@
         <div class="who">Student, Tailoring course</div>
       </div>
     </div>
+
+    <div class="review-write glass">
+      <h3>Write a review</h3>
+      <p class="sub">Studied with us or had something stitched? Let others know how it went.</p>
+      <form class="enquiry" id="reviewForm">
+        <div class="field">
+          <label for="revName">Your name</label>
+          <input id="revName" type="text" placeholder="Full name" required>
+        </div>
+        <div class="field">
+          <label for="revPhone">Phone number</label>
+          <input id="revPhone" type="tel" placeholder="10-digit number" required>
+        </div>
+        <div class="field">
+          <label for="revEmail">Email address</label>
+          <input id="revEmail" type="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label>Your rating</label>
+          <div class="star-picker" id="starPicker">
+            <button type="button" class="star" data-value="1" aria-label="1 star">★</button>
+            <button type="button" class="star" data-value="2" aria-label="2 stars">★</button>
+            <button type="button" class="star" data-value="3" aria-label="3 stars">★</button>
+            <button type="button" class="star" data-value="4" aria-label="4 stars">★</button>
+            <button type="button" class="star" data-value="5" aria-label="5 stars">★</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="revComment">Your review (optional)</label>
+          <textarea id="revComment" placeholder="Tell us about your experience..."></textarea>
+        </div>
+        <button type="submit" class="btn primary block">Submit Review</button>
+        <p class="form-note">Your phone and email are only used to verify your review — they're never shown publicly. Reviews are checked before they go live.</p>
+        <div class="toast" id="reviewToast"></div>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -1007,6 +1054,77 @@
       })
       .catch(function (err) {
         toast.textContent = 'Could not send that just now (' + err.message + '). Please WhatsApp us instead.';
+        toast.classList.add('show', 'error');
+      })
+      .finally(function () {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      });
+  });
+
+  // Star rating picker
+  var selectedRating = 0;
+  var starButtons = document.querySelectorAll('#starPicker .star');
+  starButtons.forEach(function (starBtn) {
+    starBtn.addEventListener('click', function () {
+      selectedRating = parseInt(starBtn.getAttribute('data-value'), 10);
+      starButtons.forEach(function (b) {
+        b.classList.toggle('active', parseInt(b.getAttribute('data-value'), 10) <= selectedRating);
+      });
+    });
+  });
+
+  document.getElementById('reviewForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var form = e.target;
+    var btn = form.querySelector('button[type="submit"]');
+    var toast = document.getElementById('reviewToast');
+
+    if (selectedRating < 1) {
+      toast.textContent = 'Please select a star rating before submitting.';
+      toast.classList.add('show', 'error');
+      return;
+    }
+
+    var name = document.getElementById('revName').value.trim();
+    var phone = document.getElementById('revPhone').value.trim();
+    var email = document.getElementById('revEmail').value.trim();
+    var comment = document.getElementById('revComment').value.trim();
+
+    btn.disabled = true;
+    var originalText = btn.textContent;
+    btn.textContent = 'Sending...';
+    toast.classList.remove('show', 'error');
+
+    fetch(API_BASE + '/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        author_name: name,
+        phone: phone,
+        email: email,
+        rating: selectedRating,
+        comment: comment || undefined
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) {
+          return res.json().then(function (d) {
+            throw new Error(d.error || 'Something went wrong.');
+          });
+        }
+        return res.json();
+      })
+      .then(function () {
+        toast.textContent = "Thanks! Your review has been received and will appear once it's checked.";
+        toast.classList.add('show');
+        form.reset();
+        selectedRating = 0;
+        starButtons.forEach(function (b) { b.classList.remove('active'); });
+      })
+      .catch(function (err) {
+        toast.textContent = 'Could not send that just now (' + err.message + '). Please try again shortly.';
         toast.classList.add('show', 'error');
       })
       .finally(function () {

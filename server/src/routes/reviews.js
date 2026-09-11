@@ -29,11 +29,14 @@ router.get('/', async (req, res, next) => {
 });
 
 // PUBLIC -- submit a review. Goes into 'pending' -- never auto-published.
+// Phone and email are collected but never shown publicly -- only in admin moderation.
 router.post(
   '/',
   submitLimiter,
   [
     body('author_name').trim().isLength({ min: 1, max: 200 }),
+    body('phone').trim().isLength({ min: 6, max: 20 }),
+    body('email').trim().isEmail().normalizeEmail(),
     body('rating').isInt({ min: 1, max: 5 }),
     body('comment').optional().trim().isLength({ max: 2000 }),
   ],
@@ -43,12 +46,12 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ error: 'Please check the review form and try again.', details: errors.array() });
       }
-      const { author_name, rating, comment } = req.body;
+      const { author_name, phone, email, rating, comment } = req.body;
       const { rows } = await pool.query(
-        `INSERT INTO reviews (author_name, rating, comment, source, status)
-         VALUES ($1, $2, $3, 'website form', 'pending')
+        `INSERT INTO reviews (author_name, phone, email, rating, comment, source, status)
+         VALUES ($1, $2, $3, $4, $5, 'website form', 'pending')
          RETURNING id, author_name, rating, status, created_at`,
-        [author_name, rating, comment || null]
+        [author_name, phone, email, rating, comment || null]
       );
       res.status(201).json(rows[0]);
     } catch (err) {
@@ -57,11 +60,12 @@ router.post(
   }
 );
 
-// ADMIN -- list all reviews regardless of status, for moderation.
+// ADMIN -- list all reviews regardless of status, for moderation. Includes contact
+// details so Angel can follow up with a reviewer if needed -- never exposed publicly.
 router.get('/all', requireAuth, requireRole('ADMIN', 'SUPER_ADMIN'), async (req, res, next) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, author_name, rating, comment, status, source, created_at
+      `SELECT id, author_name, phone, email, rating, comment, status, source, created_at
        FROM reviews ORDER BY created_at DESC`
     );
     res.json(rows);

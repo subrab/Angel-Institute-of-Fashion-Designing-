@@ -20,7 +20,7 @@ dated migration files, once the backend project exists to run them from).
 | `courses` | Course catalog — track, name, duration, whether it's a certification course. No fee column, per confirmed policy (fees are enquiry-only). |
 | `leads` | Every enquiry from the website's contact form. |
 | `gallery_items` | Photos shown on the site, tagged institute/tailoring. |
-| `reviews` | Reviews, held in `pending` status until approved for public display. |
+| `reviews` | Reviews, held in `pending` status until approved for public display. Collects reviewer phone/email for follow-up — never shown publicly, admin-only. |
 | `site_settings` | Key/value store for contact info, hours, etc. — editable without a redeploy. |
 
 Reserved for later releases (not yet created): `students`, `customers`, `batches`,
